@@ -5,10 +5,10 @@
 
     <groupId>pitt.infsci2140</groupId>
     <artifactId>finalprj</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <packaging>jar</packaging>
 
-    <name>final</name>
+    <name>IR Final Project</name>
     <description>INFSCI 2140 final project</description>
 
     <parent>
@@ -19,9 +19,10 @@
     </parent>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
+        <project.fileenc>UTF-8</project.fileenc>
+        <project.build.sourceEncoding>${project.fileenc}</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>${project.fileenc}</project.reporting.outputEncoding>
     </properties>
 
     <dependencies>
@@ -78,6 +79,17 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>pitt.infsci2140.finalprj.FinalApplication</mainClass>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>
