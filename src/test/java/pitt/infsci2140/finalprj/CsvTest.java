@@ -24,6 +24,9 @@ public class CsvTest {
                 String comment = record.get("comment_text");
                 String usefulCount = record.get("comment_useful");
                 String starCount = record.get("comment_star");
+                if (!Character.isLetterOrDigit(comment.charAt(0))) {
+                    System.err.println(String.format("%d: %c", i, comment.charAt(0)));
+                }
                 try {
                     assertFalse(String.format("Error at line <%d>", i), Integer.parseInt(usefulCount) < 0);
                     assertFalse(String.format("Error at line <%d>", i), Double.parseDouble(starCount) < 0);

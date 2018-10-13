@@ -41,11 +41,11 @@ db.bussiness.aggregate([{
     comment_date: 1
   }
 }]).forEach(function (d) {
-  ct = d.comment_text.split("\n").join("  ");
+  ct = d.comment_text.split("\r\n").join("  ");
+  ct = ct.split("\n").join("  ");
   ct = ct.split("\r").join("  ");
-  ct = ct.split("\r\n").join("  ");
   ct = ct.replace(/"/g, '""');
   dn = d.name.replace(/"/g, '""');
   da = d.address.replace(/"/g, '""');
-  print("\"" + d.business_id + "\",\"" + dn + "\",\"" + d.neighborhood + "\",\"" + da + "\",\"" + d.postal_code + "\",\"" + d.stars + "\",\"'" + ct + "\",\"" + d.comment_useful + "\",\"" + d.comment_funny + "\",\"" + d.comment_cool + "\",\"" + d.comment_star + "\",\"" + d.comment_date + "\"");
+  print("\"" + d.business_id + "\",\"" + dn + "\",\"" + d.neighborhood + "\",\"" + da + "\",\"" + d.postal_code + "\",\"" + d.stars + "\",\"" + ct + "\",\"" + d.comment_useful + "\",\"" + d.comment_funny + "\",\"" + d.comment_cool + "\",\"" + d.comment_star + "\",\"" + d.comment_date + "\"");
 });
