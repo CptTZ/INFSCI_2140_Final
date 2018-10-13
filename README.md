@@ -6,19 +6,25 @@
 
 ### Dependency
 
-- Any JDK 1.8+
-- Maven manages the rest of them
+- OpenJDK 1.8, and have `java`, `javac` added to your `PATH` variable.
+- Maven manages the rest of the dependencies
 
-### Howto
+### How to
 
 - Build
+
+Skip the unit test to speed up. Command as follows:
 
 ```shell
 ./mvnw clean package -DskipTests=true
 ```
 
+If you want to run tests, be sure to put `pgh_review.csv` in appropriate position.
+
 - Start
 
-Exec this: `java -jar target/finalprj-0.0.1.jar`
+```shell
+java -jar target/finalprj-0.0.1.jar
+```
 
 Then goto any web browser, view <http://127.0.0.1:10088>.

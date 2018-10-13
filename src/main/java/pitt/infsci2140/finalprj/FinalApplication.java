@@ -9,6 +9,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.util.TimeZone;
 
+/**
+ * Don't change anything in this class UNLESS necessary
+ */
 @SpringBootApplication
 public class FinalApplication implements ApplicationRunner {
 

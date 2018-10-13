@@ -45,5 +45,7 @@ db.bussiness.aggregate([{
   ct = ct.split("\r").join("  ");
   ct = ct.split("\r\n").join("  ");
   ct = ct.replace(/"/g, '""');
-  print("\"" + d.business_id + "\",\"" + d.name + "\",\"" + d.neighborhood + "\",\"" + d.address + "\",\"" + d.postal_code + "\",\"" + d.stars + "\",\"" + ct + "\",\"" + d.comment_useful + "\",\"" + d.comment_funny + "\",\"" + d.comment_cool + "\",\"" + d.comment_star + "\",\"" + d.comment_date + "\"");
+  dn = d.name.replace(/"/g, '""');
+  da = d.address.replace(/"/g, '""');
+  print("\"" + d.business_id + "\",\"" + dn + "\",\"" + d.neighborhood + "\",\"" + da + "\",\"" + d.postal_code + "\",\"" + d.stars + "\",\"'" + ct + "\",\"" + d.comment_useful + "\",\"" + d.comment_funny + "\",\"" + d.comment_cool + "\",\"" + d.comment_star + "\",\"" + d.comment_date + "\"");
 });

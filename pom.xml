@@ -26,6 +26,12 @@
     </properties>
 
     <dependencies>
+        <!-- Project specific -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.6</version>
+        </dependency>
         <!-- Lucene -->
         <dependency>
             <groupId>org.apache.lucene</groupId>
