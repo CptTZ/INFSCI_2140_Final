@@ -3,8 +3,9 @@ package pitt.infsci2140.finalprj.controller.search;
 import org.apache.lucene.document.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import pitt.infsci2140.finalprj.controller.search.vo.SearchResultBean;
 import pitt.infsci2140.finalprj.controller.search.vo.SearchSubmissionBean;
@@ -15,12 +16,16 @@ import java.util.ArrayList;
 @Controller
 public class SearchController {
 
+    private final SearchService searchService;
+
     @Autowired
-    private SearchService searchService;
+    public SearchController(SearchService searchService) {
+        this.searchService = searchService;
+    }
 
     @PostMapping("/api/search")
     @ResponseBody
-    public ArrayList<SearchResultBean> greetingSubmit(@RequestBody SearchSubmissionBean search) {
+    public ArrayList<SearchResultBean> greetingSubmit(@ModelAttribute SearchSubmissionBean search, Model model) {
         Object[] res = searchService.queryByTerm(search.getQuery(), 10);
         ArrayList<SearchResultBean> srb = new ArrayList<>(0);
         if (res[1] != null) {
