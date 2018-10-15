@@ -1,3 +1,7 @@
+# Project specific
+pgh_review.csv
+/lucene/
+
 ### macOS template
 # General
 .DS_Store
