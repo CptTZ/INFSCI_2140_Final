@@ -1,61 +1,36 @@
 package pitt.infsci2140.finalprj.lucene;
 
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.similarities.BM25Similarity;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 import org.junit.Test;
-import pitt.infsci2140.finalprj.misc.Config;
+import pitt.infsci2140.finalprj.service.SearchService;
 
-import java.nio.file.Paths;
+import java.util.ArrayList;
 
 public class queryTest {
 
-    private Directory directory;
-    private DirectoryReader ireader;
-    private IndexSearcher isearcher;
+    private SearchService ss = new SearchService();
 
     @Test
-    public void bm25QueryTest() throws Exception {
-        this.directory = FSDirectory.open(Paths.get(Config.LUCENE_INDEX_PATH));
-        this.ireader = DirectoryReader.open(directory);
-        this.isearcher = genIxSearcher(this.ireader);
-
-        searchTerm("Chicken");
-        searchTerm("Chicken wings");
-        searchTerm("\"Chicken wings\"");
-        searchTerm("Chinese");
-
-        this.directory.close();
+    public void testSearch() {
+        searchImpl("Chicken");
+        searchImpl("Chicken wings");
+        searchImpl("\"Chicken wings\"");
+        searchImpl("Chinese");
     }
 
-    private void searchTerm(String term) throws Exception {
-        QueryParser qp = new QueryParser("TEXT", new StandardAnalyzer());
-        Query q = qp.parse(term);
-        TopDocs tops = isearcher.search(q, 10);
-        outputLog(String.format("For term <%s>, total results: %d", term, tops.totalHits));
-
-        ScoreDoc[] docs = tops.scoreDocs;
-        for (ScoreDoc doc : docs) {
-            int id = doc.doc;
-            Document foundDoc = ireader.document(id);
-            outputLog(String.format("Comment ID: <%s>, name: '%s', address: <%s>, score: %f",
-                    foundDoc.get("CID"), foundDoc.get("NAME"), foundDoc.get("ADDR"), doc.score));
+    private void searchImpl(String data) {
+        Object[] search = ss.queryByTerm(data, 10);
+        outputLog(String.format("Term <%s> has <%s> hits", data, String.valueOf(search[0])));
+        if (search[1] != null) {
+            ArrayList<Document> docs = (ArrayList<Document>) search[1];
+            ArrayList<Float> scores = (ArrayList<Float>) search[2];
+            for (int i = 0; i < docs.size(); i++) {
+                Document foundDoc = docs.get(i);
+                outputLog(String.format("Comment ID: <%s>, name: '%s', address: <%s>, score: %f",
+                        foundDoc.get("CID"), foundDoc.get("NAME"), foundDoc.get("ADDR"), scores.get(i)));
+            }
+            outputLog(null);
         }
-        outputLog(null);
-    }
-
-    private IndexSearcher genIxSearcher(DirectoryReader reader) {
-        IndexSearcher searcher = new IndexSearcher(reader);
-        searcher.setSimilarity(new BM25Similarity());
-        return searcher;
     }
 
     private void outputLog(String data) {

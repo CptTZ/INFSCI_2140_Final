@@ -1,4 +1,4 @@
-package pitt.infsci2140.finalprj.controller;
+package pitt.infsci2140.finalprj.controller.index;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
