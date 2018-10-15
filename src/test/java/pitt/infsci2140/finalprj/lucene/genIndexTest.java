@@ -7,9 +7,10 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.TextField;
-import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.search.similarities.BM25Similarity;
+import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.junit.Assert;
@@ -32,7 +33,7 @@ public class genIndexTest {
     @Test
     public void genNewTest() throws Exception {
         this.metaFieldType = genFieldTypeMeta();
-        this.ixwriter = genIxWriter();
+        this.ixwriter = genIxWriter(new BM25Similarity());
         Reader in = new FileReader("./pgh_review.csv");
         Iterable<CSVRecord> records = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(in);
         for (CSVRecord record : records) {
@@ -43,21 +44,12 @@ public class genIndexTest {
         this.directory.close();
     }
 
-    private IndexWriter genIxWriter() throws Exception {
+    private IndexWriter genIxWriter(Similarity s) throws Exception {
         this.directory = FSDirectory.open(Paths.get(Config.LUCENE_INDEX_PATH));
         IndexWriterConfig config = new IndexWriterConfig(new StandardAnalyzer());
         config.setMaxBufferedDocs(10000);
-        // config.setSimilarity(new BM25Similarity());
+        if (s != null) config.setSimilarity(s);
         return new IndexWriter(this.directory, config);
-    }
-
-    private FieldType genFieldType() {
-        FieldType fieldType = new FieldType();
-        fieldType.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS);
-        fieldType.setStored(false);
-        fieldType.setStoreTermVectors(true);
-        fieldType.setTokenized(false);
-        return fieldType;
     }
 
     private FieldType genFieldTypeMeta() {

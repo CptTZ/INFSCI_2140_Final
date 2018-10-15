@@ -29,6 +29,9 @@ public class queryTest {
         this.isearcher = genIxSearcher(this.ireader);
 
         searchTerm("Chicken");
+        searchTerm("Chicken wings");
+        searchTerm("\"Chicken wings\"");
+        searchTerm("Chinese");
 
         this.directory.close();
     }
@@ -37,14 +40,16 @@ public class queryTest {
         QueryParser qp = new QueryParser("TEXT", new StandardAnalyzer());
         Query q = qp.parse(term);
         TopDocs tops = isearcher.search(q, 10);
-        outputLog("Total Results: " + tops.totalHits);
+        outputLog(String.format("For term <%s>, total results: %d", term, tops.totalHits));
 
         ScoreDoc[] docs = tops.scoreDocs;
         for (ScoreDoc doc : docs) {
             int id = doc.doc;
             Document foundDoc = ireader.document(id);
-            outputLog(String.format("Name: '%s', address: <%s>, score: %f", foundDoc.get("NAME"), foundDoc.get("ADDR"), doc.score));
+            outputLog(String.format("Comment ID: <%s>, name: '%s', address: <%s>, score: %f",
+                    foundDoc.get("CID"), foundDoc.get("NAME"), foundDoc.get("ADDR"), doc.score));
         }
+        outputLog(null);
     }
 
     private IndexSearcher genIxSearcher(DirectoryReader reader) {
@@ -54,6 +59,10 @@ public class queryTest {
     }
 
     private void outputLog(String data) {
+        if (data == null) {
+            System.err.println();
+            return;
+        }
         System.err.println(data);
     }
 
