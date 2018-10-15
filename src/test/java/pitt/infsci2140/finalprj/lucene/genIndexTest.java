@@ -6,13 +6,15 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
-import org.apache.lucene.document.StoredField;
+import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.junit.Assert;
 import org.junit.Test;
+import pitt.infsci2140.finalprj.misc.Config;
 
 import java.io.FileReader;
 import java.io.Reader;
@@ -23,13 +25,13 @@ import java.nio.file.Paths;
  */
 public class genIndexTest {
 
-    private FieldType type;
+    private FieldType metaFieldType;
     private Directory directory;
     private IndexWriter ixwriter;
 
     @Test
     public void genNewTest() throws Exception {
-        this.type = genFieldType();
+        this.metaFieldType = genFieldTypeMeta();
         this.ixwriter = genIxWriter();
         Reader in = new FileReader("./pgh_review.csv");
         Iterable<CSVRecord> records = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(in);
@@ -42,26 +44,47 @@ public class genIndexTest {
     }
 
     private IndexWriter genIxWriter() throws Exception {
-        this.directory = FSDirectory.open(Paths.get("./lucene/index"));
-        IndexWriterConfig indexConfig = new IndexWriterConfig(new StandardAnalyzer());
-        indexConfig.setMaxBufferedDocs(10000);
-        return new IndexWriter(this.directory, indexConfig);
+        this.directory = FSDirectory.open(Paths.get(Config.LUCENE_INDEX_PATH));
+        IndexWriterConfig config = new IndexWriterConfig(new StandardAnalyzer());
+        config.setMaxBufferedDocs(10000);
+        // config.setSimilarity(new BM25Similarity());
+        return new IndexWriter(this.directory, config);
     }
 
     private FieldType genFieldType() {
         FieldType fieldType = new FieldType();
-        fieldType.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS);
+        fieldType.setIndexOptions(IndexOptions.DOCS_AND_FREQS_AND_POSITIONS);
         fieldType.setStored(false);
         fieldType.setStoreTermVectors(true);
+        fieldType.setTokenized(false);
+        return fieldType;
+    }
+
+    private FieldType genFieldTypeMeta() {
+        FieldType fieldType = new FieldType();
+        fieldType.setStored(true);
+        fieldType.setTokenized(false);
+        fieldType.setOmitNorms(true);
         return fieldType;
     }
 
     private Document genDocFromCSVRecord(CSVRecord record) {
         Document doc = new Document();
-        String comment_id = record.get("comment_id");
-        String comment = record.get("comment_text");
-        doc.add(new StoredField("DOCID", comment_id));
-        doc.add(new Field("TEXT", comment, this.type));
+
+        String cid = record.get("comment_id");
+        String name = record.get("name");
+        String addr = record.get("address");
+        String txt = record.get("comment_text");
+
+        Assert.assertNotNull(cid);
+        Assert.assertNotNull(name);
+        Assert.assertNotNull(addr);
+        Assert.assertNotNull(txt);
+
+        doc.add(new Field("CID", cid, this.metaFieldType));
+        doc.add(new Field("NAME", name, this.metaFieldType));
+        doc.add(new Field("ADDR", addr, this.metaFieldType));
+        doc.add(new TextField("TEXT", txt, Field.Store.NO));
         return doc;
     }
 
