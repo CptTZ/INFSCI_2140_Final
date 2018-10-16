@@ -27,7 +27,6 @@ public class SearchController {
     @PostMapping("/api/search")
     @ResponseBody
     public ArrayList<SearchResultBean> greetingSubmit(@ModelAttribute SearchSubmissionBean search, Model model) {
-        if (search.getQuery() == null || search.getQuery().isEmpty()) return new ArrayList<>(0);
         Object[] res = searchService.queryByTerm(search.getQuery(), 10);
         ArrayList<SearchResultBean> srb = new ArrayList<>(0);
         if (res[1] != null) {

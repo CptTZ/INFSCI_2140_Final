@@ -12,9 +12,12 @@ public class queryTest {
 
     @Test
     public void testSearch() {
+        searchImpl(null);
+        searchImpl("");
         searchImpl("Chicken");
         searchImpl("Chicken wings");
         searchImpl("\"Chicken wings\"");
+        searchImpl("Chicken && wings");
         searchImpl("Chinese");
     }
 

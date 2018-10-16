@@ -9,11 +9,11 @@ import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.search.similarities.BM25Similarity;
 import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import pitt.infsci2140.finalprj.misc.Config;
 
@@ -31,6 +31,7 @@ public class genIndexTest {
     private IndexWriter ixwriter;
 
     @Test
+    @Ignore
     public void genNewTest() throws Exception {
         this.metaFieldType = genFieldTypeMeta();
         this.ixwriter = genIxWriter(Config.PROJECT_DEFAULT_SIM);

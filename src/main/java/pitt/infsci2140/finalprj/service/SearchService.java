@@ -36,14 +36,12 @@ public class SearchService {
      * @return 0: total match; 1: Documents (In a list); 2: Score (In a list)
      */
     public Object[] queryByTerm(String term, int resultLimit) {
-        Object[] res;
+        Object[] res = new Object[]{0, null, null};
+        if (term == null || term.isEmpty()) return res;
         try {
             res = generateResultDocs(term, resultLimit);
         } catch (Exception e) {
             logger.error("Search term failed", e);
-            res = new Object[]{0, null, null};
-        } finally {
-            stopSearch();
         }
         return res;
     }
@@ -63,6 +61,7 @@ public class SearchService {
     }
 
     private void prepSearch() throws IOException {
+        if (!isSearcherNotReady()) return;
         this.reader = DirectoryReader.open(FSDirectory.open(Paths.get(Config.LUCENE_INDEX_PATH)));
         this.indexSearcher = genIdxSearcher(Config.PROJECT_DEFAULT_SIM);
     }
@@ -83,7 +82,7 @@ public class SearchService {
         if (isSearcherNotReady()) prepSearch();
         TopDocs tops = indexSearcher.search(queryParser.parse(term), limit);
 
-        logger.debug(String.format("Term <%s>, result#: %d", term, tops.totalHits));
+        logger.debug("Term {}, result#: {}", term, tops.totalHits);
         return tops;
     }
 

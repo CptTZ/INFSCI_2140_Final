@@ -27,7 +27,7 @@ public class FinalApplication implements ApplicationRunner {
         if (args.getSourceArgs().length > 0)
             logger.warn("Command-line arguments: {}", String.join(",", args.getSourceArgs()));
         for (String name : args.getOptionNames()) {
-            logger.warn(String.format("Non-option->%s=%s", name, args.getOptionValues(name)));
+            logger.warn("Non-option->{}={}", name, args.getOptionValues(name));
         }
     }
 }

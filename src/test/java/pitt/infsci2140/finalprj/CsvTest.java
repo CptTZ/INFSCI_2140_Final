@@ -2,6 +2,7 @@ package pitt.infsci2140.finalprj;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.FileReader;
@@ -13,6 +14,7 @@ import static org.junit.Assert.fail;
 public class CsvTest {
 
     @Test
+    @Ignore
     public void testParse() throws Exception {
         // Change the path to pgh_review.csv
         Reader in = new FileReader("./pgh_review.csv");
