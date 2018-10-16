@@ -1,4 +1,4 @@
-print("business_id,name,neighborhood,address,postal_code,stars,comment_text,comment_useful,comment_funny,comment_cool,comment_star,comment_date")
+print("business_id,comment_id,name,neighborhood,address,postal_code,stars,comment_text,comment_useful,comment_funny,comment_cool,comment_star,comment_date")
 db.bussiness.aggregate([{
   $match: {
     city: "Pittsburgh",
@@ -17,6 +17,7 @@ db.bussiness.aggregate([{
   }
 }, {
   $addFields: {
+    comment_id: '$bid.review_id',
     comment_text: '$bid.text',
     comment_useful: '$bid.useful',
     comment_funny: '$bid.funny',
@@ -33,6 +34,7 @@ db.bussiness.aggregate([{
     address: 1,
     postal_code: 1,
     stars: 1,
+    comment_id: 1,
     comment_text: 1,
     comment_useful: 1,
     comment_funny: 1,
@@ -47,5 +49,5 @@ db.bussiness.aggregate([{
   ct = ct.replace(/"/g, '""');
   dn = d.name.replace(/"/g, '""');
   da = d.address.replace(/"/g, '""');
-  print("\"" + d.business_id + "\",\"" + dn + "\",\"" + d.neighborhood + "\",\"" + da + "\",\"" + d.postal_code + "\",\"" + d.stars + "\",\"" + ct + "\",\"" + d.comment_useful + "\",\"" + d.comment_funny + "\",\"" + d.comment_cool + "\",\"" + d.comment_star + "\",\"" + d.comment_date + "\"");
+  print("\"" + d.business_id + "\",\"" + d.comment_id + "\",\"" + dn + "\",\"" + d.neighborhood + "\",\"" + da + "\",\"" + d.postal_code + "\",\"" + d.stars + "\",\"" + ct + "\",\"" + d.comment_useful + "\",\"" + d.comment_funny + "\",\"" + d.comment_cool + "\",\"" + d.comment_star + "\",\"" + d.comment_date + "\"");
 });
