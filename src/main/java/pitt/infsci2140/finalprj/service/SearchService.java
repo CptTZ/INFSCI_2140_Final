@@ -6,10 +6,8 @@ import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.search.similarities.BM25Similarity;
 import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.FSDirectory;
 import org.slf4j.Logger;
@@ -27,6 +25,7 @@ public class SearchService {
 
     private IndexSearcher indexSearcher;
     private DirectoryReader reader;
+    private final QueryParser queryParser = new QueryParser(Config.INDEXER_COMMENT_TXT, new StandardAnalyzer());
 
     public SearchService() {
     }
@@ -81,11 +80,8 @@ public class SearchService {
     }
 
     private TopDocs searchTerm(String term, int limit) throws ParseException, IOException {
-        QueryParser qp = new QueryParser("TEXT", new StandardAnalyzer());
-        Query q = qp.parse(term);
-
         if (isSearcherNotReady()) prepSearch();
-        TopDocs tops = indexSearcher.search(q, limit);
+        TopDocs tops = indexSearcher.search(queryParser.parse(term), limit);
 
         logger.debug(String.format("Term <%s>, result#: %d", term, tops.totalHits));
         return tops;
