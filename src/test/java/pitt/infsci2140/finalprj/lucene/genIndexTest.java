@@ -47,7 +47,6 @@ public class genIndexTest {
     private IndexWriter genIxWriter(Similarity s) throws Exception {
         this.directory = FSDirectory.open(Paths.get(Config.LUCENE_INDEX_PATH));
         IndexWriterConfig config = new IndexWriterConfig(new StandardAnalyzer());
-        config.setMaxBufferedDocs(10000);
         if (s != null) config.setSimilarity(s);
         return new IndexWriter(this.directory, config);
     }
