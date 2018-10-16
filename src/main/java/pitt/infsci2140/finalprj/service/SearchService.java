@@ -10,6 +10,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.similarities.BM25Similarity;
+import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.FSDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,11 +65,11 @@ public class SearchService {
 
     private void prepSearch() throws IOException {
         this.reader = DirectoryReader.open(FSDirectory.open(Paths.get(Config.LUCENE_INDEX_PATH)));
-        this.indexSearcher = genIdxSearcher();
+        this.indexSearcher = genIdxSearcher(Config.PROJECT_DEFAULT_SIM);
     }
 
     private void stopSearch() {
-        if (!isSearcherReady()) return;
+        if (isSearcherNotReady()) return;
         try {
             this.reader.close();
         } catch (IOException e) {
@@ -83,20 +84,20 @@ public class SearchService {
         QueryParser qp = new QueryParser("TEXT", new StandardAnalyzer());
         Query q = qp.parse(term);
 
-        if (!isSearcherReady()) prepSearch();
+        if (isSearcherNotReady()) prepSearch();
         TopDocs tops = indexSearcher.search(q, limit);
 
         logger.debug(String.format("Term <%s>, result#: %d", term, tops.totalHits));
         return tops;
     }
 
-    private boolean isSearcherReady() {
-        return (this.reader != null && this.indexSearcher != null);
+    private boolean isSearcherNotReady() {
+        return (this.reader == null || this.indexSearcher == null);
     }
 
-    private IndexSearcher genIdxSearcher() {
+    private IndexSearcher genIdxSearcher(Similarity s) {
         IndexSearcher searcher = new IndexSearcher(this.reader);
-        searcher.setSimilarity(new BM25Similarity());
+        if (s != null) searcher.setSimilarity(s);
         return searcher;
     }
 

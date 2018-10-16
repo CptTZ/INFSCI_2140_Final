@@ -33,7 +33,7 @@ public class genIndexTest {
     @Test
     public void genNewTest() throws Exception {
         this.metaFieldType = genFieldTypeMeta();
-        this.ixwriter = genIxWriter(new BM25Similarity());
+        this.ixwriter = genIxWriter(Config.PROJECT_DEFAULT_SIM);
         Reader in = new FileReader("./pgh_review.csv");
         Iterable<CSVRecord> records = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(in);
         for (CSVRecord record : records) {
@@ -72,10 +72,10 @@ public class genIndexTest {
         Assert.assertNotNull(addr);
         Assert.assertNotNull(txt);
 
-        doc.add(new Field("CID", cid, this.metaFieldType));
-        doc.add(new Field("NAME", name, this.metaFieldType));
-        doc.add(new Field("ADDR", addr, this.metaFieldType));
-        doc.add(new TextField("TEXT", txt, Field.Store.NO));
+        doc.add(new Field(Config.INDEXER_COMMENT_ID, cid, this.metaFieldType));
+        doc.add(new Field(Config.INDEXER_SHOP_NAME, name, this.metaFieldType));
+        doc.add(new Field(Config.INDEXER_SHOP_ADDRESS, addr, this.metaFieldType));
+        doc.add(new TextField(Config.INDEXER_COMMENT_TXT, txt, Field.Store.NO));
         return doc;
     }
 

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import pitt.infsci2140.finalprj.controller.search.vo.SearchResultBean;
 import pitt.infsci2140.finalprj.controller.search.vo.SearchSubmissionBean;
+import pitt.infsci2140.finalprj.misc.Config;
 import pitt.infsci2140.finalprj.service.SearchService;
 
 import java.util.ArrayList;
@@ -36,9 +37,9 @@ public class SearchController {
             for (int i = 0; i < docs.size(); i++) {
                 Document foundDoc = docs.get(i);
                 SearchResultBean s = new SearchResultBean();
-                s.setAddress(foundDoc.get("ADDR"));
-                s.setCommentId(foundDoc.get("CID"));
-                s.setName(foundDoc.get("NAME"));
+                s.setAddress(foundDoc.get(Config.INDEXER_SHOP_ADDRESS));
+                s.setCommentId(foundDoc.get(Config.INDEXER_COMMENT_ID));
+                s.setName(foundDoc.get(Config.INDEXER_SHOP_NAME));
                 s.setScore(scores.get(i));
                 srb.add(s);
             }
