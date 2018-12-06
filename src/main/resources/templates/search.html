@@ -4,13 +4,12 @@
       layout:decorator="~{layout/basic}">
 
   <body layout:fragment="body">
+    <link rel="stylesheet" href="/css/search.css">
 
-    <form id="searchForm">
-      <div class="jumbotron input-group mb-3">
-        <input name="query" class="form-control" placeholder="Type whatever you want to search...">
-        <div class="input-group-append">
-          <button class="btn btn-outline-secondary" type="submit">Search</button>
-        </div>
+    <form class="search" id="searchForm">
+      <div class="search__wrapper">
+        <input type="text" name="query" placeholder="Search Pittsburgh..." class="search__field">
+        <button type="submit" class="fa fa-search search__icon"></button>
       </div>
     </form>
 
