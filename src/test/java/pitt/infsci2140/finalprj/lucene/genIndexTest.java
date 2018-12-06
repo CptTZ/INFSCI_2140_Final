@@ -36,7 +36,7 @@ public class genIndexTest {
     }
 
     @Test
-    //@Ignore
+    @Ignore
     public void genNewTest() throws Exception {
         IndexWriter ixwriter = genIxWriter(Config.PROJECT_DEFAULT_SIM);
         Reader in = new FileReader("./pgh_review.csv");
