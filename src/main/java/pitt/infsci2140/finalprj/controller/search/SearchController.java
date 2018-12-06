@@ -26,12 +26,6 @@ public class SearchController {
         this.searchService = searchService;
     }
 
-    @GetMapping("/search")
-    public ModelAndView index(ModelAndView modelAndView) {
-        modelAndView.setViewName("search");
-        return modelAndView;
-    }
-
     @PostMapping("/api/search")
     @ResponseBody
     public ArrayList<SearchResultBean> greetingSubmit(@ModelAttribute SearchSubmissionBean search, Model model) {

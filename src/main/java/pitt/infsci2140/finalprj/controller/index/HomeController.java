@@ -9,7 +9,7 @@ public class HomeController {
 
     @GetMapping("/")
     public ModelAndView index(ModelAndView modelAndView) {
-        modelAndView.setViewName("index");
+        modelAndView.setViewName("search");
         return modelAndView;
     }
 
