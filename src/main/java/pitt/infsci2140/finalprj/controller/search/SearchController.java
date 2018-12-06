@@ -4,9 +4,11 @@ import org.apache.lucene.document.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 import pitt.infsci2140.finalprj.controller.search.vo.SearchResultBean;
 import pitt.infsci2140.finalprj.controller.search.vo.SearchSubmissionBean;
 import pitt.infsci2140.finalprj.misc.Config;
@@ -22,6 +24,12 @@ public class SearchController {
     @Autowired
     public SearchController(SearchService searchService) {
         this.searchService = searchService;
+    }
+
+    @GetMapping("/search")
+    public ModelAndView index(ModelAndView modelAndView) {
+        modelAndView.setViewName("search");
+        return modelAndView;
     }
 
     @PostMapping("/api/search")

@@ -3,10 +3,7 @@ package pitt.infsci2140.finalprj.lucene;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.FieldType;
-import org.apache.lucene.document.TextField;
+import org.apache.lucene.document.*;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.search.similarities.Similarity;
@@ -26,23 +23,31 @@ import java.nio.file.Paths;
  */
 public class genIndexTest {
 
-    private FieldType metaFieldType;
+    private final FieldType metaFieldType = genFieldTypeMeta();
     private Directory directory;
-    private IndexWriter ixwriter;
+
+    private FieldType genFieldTypeMeta() {
+        FieldType fieldType = new FieldType();
+        fieldType.setStored(true);
+        fieldType.setTokenized(false);
+        fieldType.setOmitNorms(true);
+        fieldType.freeze();
+        return fieldType;
+    }
 
     @Test
-    @Ignore
+    //@Ignore
     public void genNewTest() throws Exception {
-        this.metaFieldType = genFieldTypeMeta();
-        this.ixwriter = genIxWriter(Config.PROJECT_DEFAULT_SIM);
+        IndexWriter ixwriter = genIxWriter(Config.PROJECT_DEFAULT_SIM);
         Reader in = new FileReader("./pgh_review.csv");
         Iterable<CSVRecord> records = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(in);
         for (CSVRecord record : records) {
             Document doc = genDocFromCSVRecord(record);
             ixwriter.addDocument(doc);
         }
-        this.ixwriter.close();
+        ixwriter.close();
         this.directory.close();
+        in.close();
     }
 
     private IndexWriter genIxWriter(Similarity s) throws Exception {
@@ -52,14 +57,6 @@ public class genIndexTest {
         return new IndexWriter(this.directory, config);
     }
 
-    private FieldType genFieldTypeMeta() {
-        FieldType fieldType = new FieldType();
-        fieldType.setStored(true);
-        fieldType.setTokenized(false);
-        fieldType.setOmitNorms(true);
-        return fieldType;
-    }
-
     private Document genDocFromCSVRecord(CSVRecord record) {
         Document doc = new Document();
 
@@ -67,16 +64,29 @@ public class genIndexTest {
         String name = record.get("name");
         String addr = record.get("address");
         String txt = record.get("comment_text");
+        Long cool = Long.valueOf(record.get("comment_cool"));
+        Long useful = Long.valueOf(record.get("comment_useful"));
+        Long fun = Long.valueOf(record.get("comment_funny"));
+        Long star = Long.valueOf(record.get("comment_star"));
 
         Assert.assertNotNull(cid);
         Assert.assertNotNull(name);
         Assert.assertNotNull(addr);
         Assert.assertNotNull(txt);
+        Assert.assertTrue(cool >= 0);
+        Assert.assertTrue(useful >= 0);
+        Assert.assertTrue(fun >= 0);
+        Assert.assertTrue(star >= 0);
 
         doc.add(new Field(Config.INDEXER_COMMENT_ID, cid, this.metaFieldType));
         doc.add(new Field(Config.INDEXER_SHOP_NAME, name, this.metaFieldType));
         doc.add(new Field(Config.INDEXER_SHOP_ADDRESS, addr, this.metaFieldType));
-        doc.add(new TextField(Config.INDEXER_COMMENT_TXT, txt, Field.Store.NO));
+        doc.add(new TextField(Config.INDEXER_COMMENT_TXT, txt, Field.Store.YES));
+        doc.add(new SortedNumericDocValuesField(Config.INDEXER_NUM_COOL, cool));
+        doc.add(new SortedNumericDocValuesField(Config.INDEXER_NUM_USEFUL, useful));
+        doc.add(new SortedNumericDocValuesField(Config.INDEXER_NUM_FUN, fun));
+        doc.add(new SortedNumericDocValuesField(Config.INDEXER_NUM_STAR, star));
+
         return doc;
     }
 
