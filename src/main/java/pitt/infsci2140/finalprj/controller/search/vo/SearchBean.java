@@ -1,10 +1,6 @@
 package pitt.infsci2140.finalprj.controller.search.vo;
 
-/**
- * Search submitted from frontend
- */
-public class SearchSubmissionBean {
-
+public class SearchBean {
     private String query;
 
     public String getQuery() {

@@ -8,39 +8,13 @@
       <link rel="stylesheet" href="/css/search.css">
 
       <div class="d-flex flex-row justify-content-center align-items-center" style="height: 80vh;">
-        <form class="search" id="searchForm">
+        <form action="#" th:action="@{/}" class="search" method="post" th:object="${s}">
           <div class="search__wrapper">
-            <input type="text" name="query" placeholder="Search Pittsburgh..." class="search__field">
+            <input type="text" placeholder="Search Pittsburgh..." class="search__field" th:field="*{query}">
             <button type="submit" class="fa fa-search search__icon"></button>
           </div>
         </form>
       </div>
-
-      <div id="relatedRes">
-
-      </div>
-
-      <script type="text/javascript">
-        $(function(){
-          $('button[type=submit]').click(function(e){
-            e.preventDefault();
-            $.ajax({
-              type: "POST",
-              url: "http://127.0.0.1:10088/api/search",
-              data: $("#searchForm").serialize(),
-              beforeSend: function(){
-                $("#relatedRes");
-              },
-              success: function(data){
-                var i;
-                for (i = 0; i < 10; i++) {
-                  $("#relatedRes").append('<div class="card"><div class="card-header">Top ' + (parseInt(i)+1) + '</div><div class="card-body"><h5 class="card-name">' + data[i].name + '</h5><p class="card-address">Address: ' + data[i].address + ', Pittsburgh, PA</p><a href="#" class="btn btn-secondary">Detailed Info</a></div></div>');
-                }
-              }
-            });
-          });
-        });
-      </script>
 
     </div>
   </body>
