@@ -36,8 +36,9 @@ public class SearchController {
         Object[] res = searchService.queryByTerm(search.getQuery(), 20);
         if (res[0].equals(0L) || res[1] == null) {
             // No result, redo search
-            model.setViewName("search");
-            model.addObject("s", new SearchBean());
+            model.setViewName("searchResult");
+            model.addObject("hasRes", false);
+            model.addObject("retS", search);
             return model;
         }
         ArrayList<SearchResultBean> srb;
@@ -54,6 +55,7 @@ public class SearchController {
             srb.add(s);
         }
         model.setViewName("searchResult");
+        model.addObject("hasRes", true);
         model.addObject("results", srb);
         model.addObject("retS", search);
         return model;

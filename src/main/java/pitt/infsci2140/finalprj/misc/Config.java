@@ -12,6 +12,7 @@ public class Config {
     private Config() {}
 
     public static final String LUCENE_INDEX_PATH = "./lucene/index";
+    public static final String LUCENE_NLP_INDEX_PATH = "./lucene/index_nlp";
     public static final ApplicationTemp APP_TMP = new ApplicationTemp(FinalApplication.class);
     public static final File IR_TMP_PATH = APP_TMP.getDir("ir");
 
