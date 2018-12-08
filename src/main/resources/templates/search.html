@@ -8,7 +8,8 @@
       <link rel="stylesheet" href="/css/search.css">
 
       <div class="d-flex flex-row justify-content-center align-items-center" style="height: 80vh;">
-        <form action="#" th:action="@{/}" class="search" method="post" th:object="${s}">
+        <h1 class="display-4 p-3">SoYelp</h1>
+        <form action="#" th:action="@{/}" class="search p-3" method="post" th:object="${s}">
           <div class="search__wrapper">
             <input type="text" placeholder="Search Pittsburgh..." class="search__field" th:field="*{query}">
             <button type="submit" class="fa fa-search search__icon"></button>
