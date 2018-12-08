@@ -6,7 +6,7 @@
 <body>
 <div layout:fragment="content">
 
-    <div id="relatedRes">
+    <div id="relatedRes" class="pb-5">
         <div class="card mt-3" th:each="res,iter : ${results}">
             <div class="card-header">
                 Top <span th:text="${iter.count}"></span>
