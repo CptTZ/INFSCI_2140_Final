@@ -29,5 +29,6 @@ public class FinalApplication implements ApplicationRunner {
         for (String name : args.getOptionNames()) {
             logger.warn("Non-option->{}={}", name, args.getOptionValues(name));
         }
+        logger.warn("Application temp dir: {}", pitt.infsci2140.finalprj.misc.Config.APP_TMP.toString());
     }
 }

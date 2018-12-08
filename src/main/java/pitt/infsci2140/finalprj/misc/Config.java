@@ -2,12 +2,18 @@ package pitt.infsci2140.finalprj.misc;
 
 import org.apache.lucene.search.similarities.BM25Similarity;
 import org.apache.lucene.search.similarities.Similarity;
+import org.springframework.boot.system.ApplicationTemp;
+import pitt.infsci2140.finalprj.FinalApplication;
+
+import java.io.File;
 
 public class Config {
 
     private Config() {}
 
     public static final String LUCENE_INDEX_PATH = "./lucene/index";
+    public static final ApplicationTemp APP_TMP = new ApplicationTemp(FinalApplication.class);
+    public static final File IR_TMP_PATH = APP_TMP.getDir("ir");
 
     public static final Similarity PROJECT_DEFAULT_SIM = new BM25Similarity();
 
