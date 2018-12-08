@@ -5,6 +5,22 @@
 
 <body>
 <div layout:fragment="content">
+    <link rel="stylesheet" href="/css/searchAgain.css">
+
+    <div class="row justify-content-center mt-3">
+        <div class="col-12 col-md-10 col-lg-8">
+            <form class="card card-sm" action="#" th:action="@{/}" method="post" th:object="${retS}">
+                <div class="card-body row no-gutters">
+                    <div class="col">
+                        <input class="form-control form-control-lg form-control-borderless" type="search" placeholder="Search Again" th:field="*{query}">
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-lg btn-success" type="submit">Search</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <div id="relatedRes" class="pb-5">
         <div class="card mt-3" th:each="res,iter : ${results}">

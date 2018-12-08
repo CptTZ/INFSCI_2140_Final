@@ -55,6 +55,7 @@ public class SearchController {
         }
         model.setViewName("searchResult");
         model.addObject("results", srb);
+        model.addObject("retS", search);
         return model;
     }
 
