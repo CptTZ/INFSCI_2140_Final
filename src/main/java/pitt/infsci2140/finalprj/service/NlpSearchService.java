@@ -45,20 +45,19 @@ public class NlpSearchService extends OriginalSearchService {
             logger.debug("Temp CSV path: {}", tmpCsvPath.getAbsolutePath());
 
             // Bridge to Python
-            String cleanedTerm = cleanQueryForNlp(term);
-            String lowerCleanedTerm = cleanedTerm.toLowerCase(Locale.US);
-            if (!this.pythonNlpCache.containsKey(lowerCleanedTerm)) {
+            String lowerTerm = term.toLowerCase(Locale.US);
+            if (!this.pythonNlpCache.containsKey(lowerTerm)) {
                 // Initial into
                 writeOutCsvForPyNLP(topDocs.scoreDocs, tmpCsvPath);
-                this.pythonNlpCache.put(lowerCleanedTerm, getPythonSentimentResult(taskUuid, tmpCsvPath, cleanedTerm));
+                this.pythonNlpCache.put(lowerTerm, getPythonSentimentResult(taskUuid, tmpCsvPath, term));
             } else {
                 // Has info but info is probably not right
-                if (this.pythonNlpCache.get(lowerCleanedTerm).isEmpty()) {
+                if (this.pythonNlpCache.get(lowerTerm).isEmpty()) {
                     writeOutCsvForPyNLP(topDocs.scoreDocs, tmpCsvPath);
-                    this.pythonNlpCache.put(lowerCleanedTerm, getPythonSentimentResult(taskUuid, tmpCsvPath, cleanedTerm));
+                    this.pythonNlpCache.put(lowerTerm, getPythonSentimentResult(taskUuid, tmpCsvPath, term));
                 }
             }
-            String pythonOutput = this.pythonNlpCache.get(lowerCleanedTerm);
+            String pythonOutput = this.pythonNlpCache.get(lowerTerm);
             JsonNode root = Config.JSON_MAPPER.readTree(pythonOutput);
             int totalHits = root.size();
             int listSize = businessLimit > totalHits ? totalHits : businessLimit;
@@ -122,7 +121,7 @@ public class NlpSearchService extends OriginalSearchService {
 
     private String getPythonSentimentResult(String taskUuid, File csvPath, String queryTerm) throws IOException {
         ProcessBuilder pb = new ProcessBuilder(Config.NLP_PYTHON_PATH, "scripts/IR-getSentiRank.py",
-                csvPath.getAbsolutePath(), queryTerm);
+                csvPath.getAbsolutePath(), cleanQueryForNlp(queryTerm));
         Process p = pb.directory(new File(System.getProperty("user.dir"))).start();
         StringWriter sw = new StringWriter(), swE = new StringWriter();
         InputStream in = p.getInputStream();
