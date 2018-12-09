@@ -32,6 +32,16 @@ public class SearchController {
     @PostMapping("/")
     public ModelAndView originalSearchResult(@ModelAttribute SearchBean search, ModelAndView model) {
         List<SearchResultBean> res = nlpSearchService.queryNormalByTerm(search.getQuery(), 20);
+        return getModelAndView(search, model, res);
+    }
+
+    @PostMapping("/advSearch")
+    public ModelAndView nlpSearchResult(@ModelAttribute SearchBean search, ModelAndView model) {
+        List<SearchResultBean> res = nlpSearchService.queryNlpByTerm(search.getQuery(), 20);
+        return getModelAndView(search, model, res);
+    }
+
+    private ModelAndView getModelAndView(@ModelAttribute SearchBean search, ModelAndView model, List<SearchResultBean> res) {
         if (res.size() == 0) {
             // No result, redo search
             model.setViewName("searchResult");
@@ -43,12 +53,6 @@ public class SearchController {
         model.addObject("hasRes", true);
         model.addObject("results", res);
         model.addObject("retS", search);
-        return model;
-    }
-
-    @PostMapping("/advSearch")
-    public ModelAndView nlpSearchResult(@ModelAttribute SearchBean search, ModelAndView model) {
-        model.setViewName("search");
         return model;
     }
 

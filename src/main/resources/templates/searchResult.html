@@ -9,13 +9,14 @@
 
     <div class="row justify-content-center mt-3">
         <div class="col-12 col-md-10 col-lg-8">
-            <form class="card card-sm" action="#" th:action="@{/}" method="post" th:object="${retS}">
+            <form class="card card-sm" th:action="@{/}" method="post" th:object="${retS}">
                 <div class="card-body row no-gutters">
                     <div class="col">
                         <input class="form-control form-control-lg form-control-borderless" type="search" placeholder="Search Again" th:field="*{query}">
                     </div>
                     <div class="col-auto">
                         <button class="btn btn-lg btn-info" type="submit">Search</button>
+                        <button class="btn btn-lg btn-dark" type="submit" formaction="/advSearch">HyperSearch</button>
                     </div>
                 </div>
             </form>

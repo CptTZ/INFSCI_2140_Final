@@ -7,6 +7,7 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import pitt.infsci2140.finalprj.controller.search.vo.SearchResultBean;
 import pitt.infsci2140.finalprj.misc.Config;
@@ -33,6 +34,7 @@ public class queryTest {
     }
 
     @Test
+    @Ignore
     public void testNlpSearch() {
         nlpSs.queryNlpByTerm("Chicken wings", 10);
     }
