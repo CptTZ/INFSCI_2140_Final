@@ -12,8 +12,8 @@ public class Config {
 
     private Config() {}
 
-    public static final OkHttpClient httpClient = new OkHttpClient();
-    public static final String yelpApiPath = "https://api.yelp.com/v3/businesses/";
+    public static final OkHttpClient HTTP_CLIENT = new OkHttpClient();
+    public static final String YELP_API_ENDPOINT = "https://api.yelp.com/v3/businesses/";
 
     public static final String NLP_PYTHON_PATH = "/home/tonyz/anaconda3/envs/ir/bin/python";
     public static final String LUCENE_ORIGINAL_INDEX_PATH = "./lucene/index_orig";
