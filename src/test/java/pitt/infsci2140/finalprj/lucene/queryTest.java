@@ -17,7 +17,7 @@ import java.util.List;
 
 public class queryTest {
 
-    private OriginalSearchService ss = new OriginalSearchService();
+    private OriginalSearchService ss = new OriginalSearchService(null);
 
     @Test
     public void testSearch() {
@@ -44,7 +44,7 @@ public class queryTest {
         outputLog(String.format("Term <%s> has <%s> hits", data, search.size()));
         for (SearchResultBean s : search) {
             outputLog(String.format("Comment ID: <%s>, name: '%s', address: <%s>, score: %f",
-                    s.getCommentId(), s.getName(), s.getAddress(), s.getScore()));
+                    s.getUrl(), s.getName(), s.getAddress(), s.getScore()));
             outputLog(null);
         }
         return search.size();

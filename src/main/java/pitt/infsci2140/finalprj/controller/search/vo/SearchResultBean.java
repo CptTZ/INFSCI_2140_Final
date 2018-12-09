@@ -5,7 +5,16 @@ public class SearchResultBean {
     private String name;
     private String address;
     private float score;
-    private String commentId;
+    private String url;
+    private String phone;
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
     public String getName() {
         return name;
@@ -31,11 +40,11 @@ public class SearchResultBean {
         this.score = score;
     }
 
-    public String getCommentId() {
-        return commentId;
+    public String getUrl() {
+        return url;
     }
 
-    public void setCommentId(String commentId) {
-        this.commentId = commentId;
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

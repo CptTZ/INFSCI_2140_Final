@@ -2,11 +2,20 @@ package pitt.infsci2140.finalprj.model;
 
 public class BusinessInfo {
 
-    private String id;
-    private String name;
-    private String display_phone;
-    private String url;
-    private double lat, lng;
+    private String id = "";
+    private String name = "";
+    private String display_phone = "";
+    private String url = "";
+    private double lat = 0, lng = 0;
+    private String simpleAddress = "";
+
+    public String getSimpleAddress() {
+        return simpleAddress;
+    }
+
+    public void setSimpleAddress(String simpleAddress) {
+        this.simpleAddress = simpleAddress;
+    }
 
     public String getUrl() {
         return url;

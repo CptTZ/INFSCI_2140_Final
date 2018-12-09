@@ -49,6 +49,16 @@ public class BusinessService {
             b.setName(root.get("name").asText().trim());
             b.setUrl(root.get("url").asText().trim());
             b.setDisplay_phone(root.get("display_phone").asText().trim());
+            StringBuilder addr = new StringBuilder();
+            JsonNode addrNode = root.get("location").get("display_address");
+            if (addrNode != null) {
+                int s = addrNode.size();
+                for (int i = 0; i < s; i++) {
+                    addr.append(addrNode.get(i).asText());
+                    addr.append(' ');
+                }
+            }
+            b.setSimpleAddress(addr.toString());
             JsonNode coord = root.get("coordinates");
             b.setLat(coord.get("latitude").asDouble());
             b.setLng(coord.get("longitude").asDouble());

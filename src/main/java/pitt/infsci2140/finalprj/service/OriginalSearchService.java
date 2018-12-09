@@ -14,9 +14,11 @@ import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.FSDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pitt.infsci2140.finalprj.controller.search.vo.SearchResultBean;
 import pitt.infsci2140.finalprj.misc.Config;
+import pitt.infsci2140.finalprj.model.BusinessInfo;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -27,11 +29,15 @@ import java.util.List;
 public class OriginalSearchService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    private final BusinessService businessService;
+
     private IndexSearcher indexSearcher;
     private DirectoryReader reader;
     private final QueryParser queryParser = new QueryParser(Config.INDEXER_COMMENT_TXT, new StandardAnalyzer());
 
-    public OriginalSearchService() {
+    @Autowired
+    public OriginalSearchService(BusinessService bs) {
+        this.businessService = bs;
     }
 
     public List<SearchResultBean> queryByTerm(String term, int resultLimit) {
@@ -103,9 +109,13 @@ public class OriginalSearchService {
     private SearchResultBean docidToSearchResultBean(int docid, float score) throws IOException {
         SearchResultBean s = new SearchResultBean();
         Document d = this.indexSearcher.doc(docid);
-        s.setAddress(d.get(Config.INDEXER_SHOP_ADDRESS));
-        s.setCommentId(d.get(Config.INDEXER_COMMENT_ID));
-        s.setName(d.get(Config.INDEXER_SHOP_NAME));
+        BusinessInfo bInfo = this.businessService.getBusinessInfoById(d.get(Config.INDEXER_BUSS_ID));
+        String addr = bInfo.getSimpleAddress();
+        String name = bInfo.getName();
+        s.setAddress(addr.isEmpty() ? d.get(Config.INDEXER_SHOP_ADDRESS) : addr);
+        s.setName(name.isEmpty() ? d.get(Config.INDEXER_SHOP_NAME) : name);
+        s.setUrl(bInfo.getUrl());
+        s.setPhone(bInfo.getDisplay_phone());
         s.setScore(score);
         return s;
     }
