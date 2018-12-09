@@ -11,18 +11,19 @@ import org.springframework.web.servlet.ModelAndView;
 import pitt.infsci2140.finalprj.controller.search.vo.SearchBean;
 import pitt.infsci2140.finalprj.controller.search.vo.SearchResultBean;
 import pitt.infsci2140.finalprj.misc.Config;
-import pitt.infsci2140.finalprj.service.SearchService;
+import pitt.infsci2140.finalprj.service.OriginalSearchService;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 public class SearchController {
 
-    private final SearchService searchService;
+    private final OriginalSearchService originalSearchService;
 
     @Autowired
-    public SearchController(SearchService searchService) {
-        this.searchService = searchService;
+    public SearchController(OriginalSearchService originalSearchService) {
+        this.originalSearchService = originalSearchService;
     }
 
     @GetMapping("/")
@@ -33,30 +34,17 @@ public class SearchController {
 
     @PostMapping("/")
     public ModelAndView greetingSubmit(@ModelAttribute SearchBean search, ModelAndView model) {
-        Object[] res = searchService.queryByTerm(search.getQuery(), 20);
-        if (res[0].equals(0L) || res[1] == null) {
+        List<SearchResultBean> res = originalSearchService.queryByTerm(search.getQuery(), 20);
+        if (res.size() == 0) {
             // No result, redo search
             model.setViewName("searchResult");
             model.addObject("hasRes", false);
             model.addObject("retS", search);
             return model;
         }
-        ArrayList<SearchResultBean> srb;
-        ArrayList<Document> docs = (ArrayList<Document>) res[1];
-        ArrayList<Float> scores = (ArrayList<Float>) res[2];
-        srb = new ArrayList<>(docs.size());
-        for (int i = 0; i < docs.size(); i++) {
-            Document foundDoc = docs.get(i);
-            SearchResultBean s = new SearchResultBean();
-            s.setAddress(foundDoc.get(Config.INDEXER_SHOP_ADDRESS));
-            s.setCommentId(foundDoc.get(Config.INDEXER_COMMENT_ID));
-            s.setName(foundDoc.get(Config.INDEXER_SHOP_NAME));
-            s.setScore(scores.get(i));
-            srb.add(s);
-        }
         model.setViewName("searchResult");
         model.addObject("hasRes", true);
-        model.addObject("results", srb);
+        model.addObject("results", res);
         model.addObject("retS", search);
         return model;
     }

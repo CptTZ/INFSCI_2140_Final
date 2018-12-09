@@ -13,56 +13,55 @@ import org.apache.lucene.store.FSDirectory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import pitt.infsci2140.finalprj.controller.search.vo.SearchResultBean;
 import pitt.infsci2140.finalprj.misc.Config;
 
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
-public class SearchService {
+public class OriginalSearchService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private IndexSearcher indexSearcher;
     private DirectoryReader reader;
     private final QueryParser queryParser = new QueryParser(Config.INDEXER_COMMENT_TXT, new StandardAnalyzer());
 
-    public SearchService() {
+    public OriginalSearchService() {
     }
 
-    /**
-     * Submit a query
-     *
-     * @return 0: total match; 1: Documents (In a list); 2: Score (In a list)
-     */
-    public Object[] queryByTerm(String term, int resultLimit) {
-        Object[] res = new Object[]{0, null, null};
-        if (term == null || term.isEmpty()) return res;
+    public List<SearchResultBean> queryByTerm(String term, int resultLimit) {
+        if (term == null || term.isEmpty()) return new ArrayList<>(0);
         try {
-            res = generateResultDocs(term, resultLimit);
+            TopDocs topDocs = searchTerm(term, resultLimit);
+            ScoreDoc[] docs = topDocs.scoreDocs;
+            int totalHits = Math.toIntExact(topDocs.totalHits);
+
+            int listSize = resultLimit > totalHits ? totalHits : resultLimit;
+            ArrayList<SearchResultBean> res = new ArrayList<>(listSize);
+
+            for (ScoreDoc doc : docs) {
+                Document oneDoc = reader.document(doc.doc);
+                SearchResultBean s = new SearchResultBean();
+                s.setAddress(oneDoc.get(Config.INDEXER_SHOP_ADDRESS));
+                s.setCommentId(oneDoc.get(Config.INDEXER_COMMENT_ID));
+                s.setName(oneDoc.get(Config.INDEXER_SHOP_NAME));
+                s.setScore(doc.score);
+                res.add(s);
+            }
+
+            return res;
         } catch (Exception e) {
             logger.error("Search term failed", e);
+            return new ArrayList<>(0);
         }
-        return res;
-    }
-
-    private Object[] generateResultDocs(String term, int resultLimit) throws ParseException, IOException {
-        TopDocs topDocs = searchTerm(term, resultLimit);
-        long totalHits = topDocs.totalHits;
-        int listSize = (int) (resultLimit > totalHits ? totalHits : resultLimit);
-        ArrayList<Document> documents = new ArrayList<>(listSize);
-        ArrayList<Float> scores = new ArrayList<>(listSize);
-        ScoreDoc[] docs = topDocs.scoreDocs;
-        for (ScoreDoc doc : docs) {
-            documents.add(reader.document(doc.doc));
-            scores.add(doc.score);
-        }
-        return new Object[]{totalHits, documents, scores};
     }
 
     private void prepSearch() throws IOException {
         if (!isSearcherNotReady()) return;
-        this.reader = DirectoryReader.open(FSDirectory.open(Paths.get(Config.LUCENE_INDEX_PATH)));
+        this.reader = DirectoryReader.open(FSDirectory.open(Paths.get(Config.LUCENE_ORIGINAL_INDEX_PATH)));
         this.indexSearcher = genIdxSearcher(Config.PROJECT_DEFAULT_SIM);
     }
 
