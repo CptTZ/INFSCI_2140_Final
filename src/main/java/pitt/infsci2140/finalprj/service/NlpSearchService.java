@@ -45,18 +45,20 @@ public class NlpSearchService extends OriginalSearchService {
             logger.debug("Temp CSV path: {}", tmpCsvPath.getAbsolutePath());
 
             // Bridge to Python
-            if (!this.pythonNlpCache.containsKey(term)) {
+            String cleanedTerm = cleanQueryForNlp(term);
+            String lowerCleanedTerm = cleanedTerm.toLowerCase(Locale.US);
+            if (!this.pythonNlpCache.containsKey(lowerCleanedTerm)) {
                 // Initial into
                 writeOutCsvForPyNLP(topDocs.scoreDocs, tmpCsvPath);
-                this.pythonNlpCache.put(term, getPythonSentimentResult(taskUuid, tmpCsvPath, term));
+                this.pythonNlpCache.put(lowerCleanedTerm, getPythonSentimentResult(taskUuid, tmpCsvPath, cleanedTerm));
             } else {
                 // Has info but info is probably not right
-                if (this.pythonNlpCache.get(term).isEmpty()) {
+                if (this.pythonNlpCache.get(lowerCleanedTerm).isEmpty()) {
                     writeOutCsvForPyNLP(topDocs.scoreDocs, tmpCsvPath);
-                    this.pythonNlpCache.put(term, getPythonSentimentResult(taskUuid, tmpCsvPath, term));
+                    this.pythonNlpCache.put(lowerCleanedTerm, getPythonSentimentResult(taskUuid, tmpCsvPath, cleanedTerm));
                 }
             }
-            String pythonOutput = this.pythonNlpCache.get(term);
+            String pythonOutput = this.pythonNlpCache.get(lowerCleanedTerm);
             JsonNode root = Config.JSON_MAPPER.readTree(pythonOutput);
             int totalHits = root.size();
             int listSize = businessLimit > totalHits ? totalHits : businessLimit;
@@ -119,9 +121,8 @@ public class NlpSearchService extends OriginalSearchService {
     }
 
     private String getPythonSentimentResult(String taskUuid, File csvPath, String queryTerm) throws IOException {
-        String cleanedQuery = cleanQueryForNlp(queryTerm);
         ProcessBuilder pb = new ProcessBuilder(Config.NLP_PYTHON_PATH, "scripts/IR-getSentiRank.py",
-                csvPath.getAbsolutePath(), cleanedQuery);
+                csvPath.getAbsolutePath(), queryTerm);
         Process p = pb.directory(new File(System.getProperty("user.dir"))).start();
         StringWriter sw = new StringWriter(), swE = new StringWriter();
         InputStream in = p.getInputStream();
