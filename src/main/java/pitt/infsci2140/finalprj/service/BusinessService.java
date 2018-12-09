@@ -1,8 +1,6 @@
 package pitt.infsci2140.finalprj.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
 import okhttp3.CacheControl;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -15,11 +13,13 @@ import pitt.infsci2140.finalprj.model.BusinessInfo;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Random;
 
 @Service
 public class BusinessService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final HashMap<String, BusinessInfo> cacheInfo = new HashMap<>(200);
+    private final HashMap<String, BusinessInfo> cacheInfo = new HashMap<>(500);
+    private final Random r = new Random();
 
     @Value("${yelp}")
     private String yelpKey;
@@ -74,8 +74,10 @@ public class BusinessService {
             if (!response.isSuccessful() || response.body() == null) {
                 throw new IOException("Unexpected code " + response);
             }
+            // Random latency to avoid Yelp's API rate limit
+            Thread.sleep(this.r.nextInt(250));
             return response.body().string();
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error("Call to Yelp API error", e);
         }
         return "";

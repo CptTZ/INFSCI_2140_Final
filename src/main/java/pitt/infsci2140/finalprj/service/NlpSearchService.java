@@ -18,10 +18,7 @@ import pitt.infsci2140.finalprj.misc.Config;
 
 import java.io.*;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class NlpSearchService extends OriginalSearchService {
@@ -29,6 +26,7 @@ public class NlpSearchService extends OriginalSearchService {
 
     private IndexSearcher nlpIndexSearcher;
     private DirectoryReader nlpReader;
+    private HashMap<String, String> pythonNlpCache = new HashMap<>(500);
 
     @Autowired
     public NlpSearchService(BusinessService bs) {
@@ -43,11 +41,22 @@ public class NlpSearchService extends OriginalSearchService {
 
             String taskUuid = UUID.randomUUID().toString();
             File tmpCsvPath = new File(Config.IR_TMP_PATH, taskUuid + ".csv");
+            tmpCsvPath.deleteOnExit();
             logger.debug("Temp CSV path: {}", tmpCsvPath.getAbsolutePath());
 
             // Bridge to Python
-            writeOutCsvForPyNLP(topDocs.scoreDocs, tmpCsvPath);
-            String pythonOutput = getPythonSentimentResult(taskUuid, tmpCsvPath, term);
+            if (!this.pythonNlpCache.containsKey(term)) {
+                // Initial into
+                writeOutCsvForPyNLP(topDocs.scoreDocs, tmpCsvPath);
+                this.pythonNlpCache.put(term, getPythonSentimentResult(taskUuid, tmpCsvPath, term));
+            } else {
+                // Has info but info is probably not right
+                if (this.pythonNlpCache.get(term).isEmpty()) {
+                    writeOutCsvForPyNLP(topDocs.scoreDocs, tmpCsvPath);
+                    this.pythonNlpCache.put(term, getPythonSentimentResult(taskUuid, tmpCsvPath, term));
+                }
+            }
+            String pythonOutput = this.pythonNlpCache.get(term);
             JsonNode root = Config.JSON_MAPPER.readTree(pythonOutput);
             int totalHits = root.size();
             int listSize = businessLimit > totalHits ? totalHits : businessLimit;
@@ -60,7 +69,6 @@ public class NlpSearchService extends OriginalSearchService {
                 res.add(bidToSearchResultBean(bid, (float) root.get(bid).asDouble()));
             }
 
-            tmpCsvPath.deleteOnExit();
             return res;
         } catch (Exception e) {
             logger.error("Search NLP failed", e);
