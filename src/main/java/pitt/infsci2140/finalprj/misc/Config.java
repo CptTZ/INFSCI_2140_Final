@@ -18,6 +18,7 @@ public class Config {
 
     public static final Similarity PROJECT_DEFAULT_SIM = new BM25Similarity();
 
+    public static final String INDEXER_BUSS_ID = "BID";
     public static final String INDEXER_COMMENT_ID = "CID";
     public static final String INDEXER_COMMENT_TXT = "TEXT";
     public static final String INDEXER_SHOP_ADDRESS = "ADDR";

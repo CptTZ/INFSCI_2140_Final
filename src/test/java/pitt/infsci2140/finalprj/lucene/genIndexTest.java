@@ -4,6 +4,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.*;
+import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.search.similarities.Similarity;
@@ -23,16 +24,15 @@ import java.nio.file.Paths;
  */
 public class genIndexTest {
 
-    private final FieldType metaFieldType = genFieldTypeMeta();
+    private static final FieldType metaFieldType = new FieldType();
     private Directory directory;
 
-    private FieldType genFieldTypeMeta() {
-        FieldType fieldType = new FieldType();
-        fieldType.setStored(true);
-        fieldType.setTokenized(false);
-        fieldType.setOmitNorms(true);
-        fieldType.freeze();
-        return fieldType;
+    static {
+        metaFieldType.setStored(true);
+        metaFieldType.setTokenized(false);
+        metaFieldType.setOmitNorms(true);
+        metaFieldType.setIndexOptions(IndexOptions.NONE);
+        metaFieldType.freeze();
     }
 
     @Test
@@ -60,6 +60,7 @@ public class genIndexTest {
     private Document genDocFromCSVRecord(CSVRecord record) {
         Document doc = new Document();
 
+        String bid = record.get("business_id");
         String cid = record.get("comment_id");
         String name = record.get("name");
         String addr = record.get("address");
@@ -78,9 +79,10 @@ public class genIndexTest {
         Assert.assertTrue(fun >= 0);
         Assert.assertTrue(star >= 0);
 
-        doc.add(new Field(Config.INDEXER_COMMENT_ID, cid, this.metaFieldType));
-        doc.add(new Field(Config.INDEXER_SHOP_NAME, name, this.metaFieldType));
-        doc.add(new Field(Config.INDEXER_SHOP_ADDRESS, addr, this.metaFieldType));
+        doc.add(new StringField(Config.INDEXER_BUSS_ID, bid, Field.Store.YES));
+        doc.add(new StringField(Config.INDEXER_COMMENT_ID, cid, Field.Store.YES));
+        doc.add(new Field(Config.INDEXER_SHOP_NAME, name, metaFieldType));
+        doc.add(new Field(Config.INDEXER_SHOP_ADDRESS, addr, metaFieldType));
         doc.add(new TextField(Config.INDEXER_COMMENT_TXT, txt, Field.Store.YES));
         doc.add(new SortedNumericDocValuesField(Config.INDEXER_NUM_COOL, cool));
         doc.add(new SortedNumericDocValuesField(Config.INDEXER_NUM_USEFUL, useful));
