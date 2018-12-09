@@ -1,5 +1,6 @@
 package pitt.infsci2140.finalprj.misc;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.OkHttpClient;
 import org.apache.lucene.search.similarities.BM25Similarity;
 import org.apache.lucene.search.similarities.Similarity;
@@ -12,6 +13,7 @@ public class Config {
 
     private Config() {}
 
+    public static final ObjectMapper JSON_MAPPER = new ObjectMapper();
     public static final OkHttpClient HTTP_CLIENT = new OkHttpClient();
     public static final String YELP_API_ENDPOINT = "https://api.yelp.com/v3/businesses/";
 

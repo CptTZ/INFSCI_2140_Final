@@ -2,6 +2,7 @@ package pitt.infsci2140.finalprj.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import okhttp3.CacheControl;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -18,7 +19,7 @@ import java.util.HashMap;
 @Service
 public class BusinessService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final HashMap<String, BusinessInfo> cacheInfo = new HashMap<>(50);
+    private final HashMap<String, BusinessInfo> cacheInfo = new HashMap<>(200);
 
     @Value("${yelp}")
     private String yelpKey;
@@ -43,9 +44,8 @@ public class BusinessService {
         String jsonData = sendRequestToAPI(bid);
         if (jsonData.isEmpty()) return b;
         b.setId(bid);
-        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            JsonNode root = objectMapper.readTree(jsonData);
+            JsonNode root = Config.JSON_MAPPER.readTree(jsonData);
             b.setName(root.get("name").asText().trim());
             b.setUrl(root.get("url").asText().trim());
             b.setDisplay_phone(root.get("display_phone").asText().trim());

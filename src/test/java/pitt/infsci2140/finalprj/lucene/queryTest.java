@@ -10,6 +10,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import pitt.infsci2140.finalprj.controller.search.vo.SearchResultBean;
 import pitt.infsci2140.finalprj.misc.Config;
+import pitt.infsci2140.finalprj.service.NlpSearchService;
 import pitt.infsci2140.finalprj.service.OriginalSearchService;
 
 import java.nio.file.Paths;
@@ -18,6 +19,7 @@ import java.util.List;
 public class queryTest {
 
     private OriginalSearchService ss = new OriginalSearchService(null);
+    private NlpSearchService nlpSs = new NlpSearchService(null);
 
     @Test
     public void testSearch() {
@@ -31,6 +33,11 @@ public class queryTest {
     }
 
     @Test
+    public void testNlpSearch() {
+        nlpSs.queryNlpByTerm("Chicken wings", 10);
+    }
+
+    @Test
     public void testSearchBid() throws Exception {
         IndexSearcher searcher = new IndexSearcher(DirectoryReader.open(FSDirectory.open(Paths.get(Config.LUCENE_ORIGINAL_INDEX_PATH))));
         Term t = new Term(Config.INDEXER_BUSS_ID, "UmZnFzo-NK2daxkl3_Rieg");
@@ -40,7 +47,7 @@ public class queryTest {
     }
 
     private int searchImpl(String data) {
-        List<SearchResultBean> search = ss.queryByTerm(data, 10);
+        List<SearchResultBean> search = ss.queryNormalByTerm(data, 10);
         outputLog(String.format("Term <%s> has <%s> hits", data, search.size()));
         for (SearchResultBean s : search) {
             outputLog(String.format("Comment ID: <%s>, name: '%s', address: <%s>, score: %f",

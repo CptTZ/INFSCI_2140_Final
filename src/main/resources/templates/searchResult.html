@@ -31,12 +31,13 @@
     <div id="relatedRes" class="pb-5" th:if="${hasRes}">
         <div class="card mt-3" th:each="res,iter : ${results}">
             <div class="card-header">
-                Top <span th:text="${iter.count}"></span>
+                Top <strong><span th:text="${iter.count}"></span></strong> <sub><span class="text-secondary">by SoYelp</span></sub>
             </div>
             <div class="card-body">
-                <h5 class="card-name" th:text="${res.name}"></h5>
-                <p class="card-address" th:text="${res.address}"></p>
-                <a th:href="${res.url}" target="_blank" class="btn btn-secondary">Info on Yelp</a>
+                <h5 class="card-title" th:text="${res.name}"></h5>
+                <h6 class="card-subtitle mb-2 text-muted" th:text="${res.phone}"></h6>
+                <p class="card-text" th:text="${res.address}"></p>
+                <a th:href="${res.url}" target="_blank" class="btn btn-secondary">Show on Yelp</a>
             </div>
         </div>
     </div>

@@ -37,12 +37,12 @@ public class genIndexTest {
 
     @Test
     @Ignore
-    public void genNewTest() throws Exception {
-        IndexWriter ixwriter = genIxWriter(Config.PROJECT_DEFAULT_SIM);
-        Reader in = new FileReader("./pgh_review.csv");
-        Iterable<CSVRecord> records = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(in);
+    public void genNlpTest() throws Exception {
+        IndexWriter ixwriter = genIxWriter(Config.PROJECT_DEFAULT_SIM, true);
+        Reader in = new FileReader("./pgh_review_nlp.csv");
+        Iterable<CSVRecord> records = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(in);
         for (CSVRecord record : records) {
-            Document doc = genDocFromCSVRecord(record);
+            Document doc = genDocFromCSVRecord(record, true);
             ixwriter.addDocument(doc);
         }
         ixwriter.close();
@@ -50,14 +50,29 @@ public class genIndexTest {
         in.close();
     }
 
-    private IndexWriter genIxWriter(Similarity s) throws Exception {
-        this.directory = FSDirectory.open(Paths.get(Config.LUCENE_ORIGINAL_INDEX_PATH));
+    @Test
+    @Ignore
+    public void genNewTest() throws Exception {
+        IndexWriter ixwriter = genIxWriter(Config.PROJECT_DEFAULT_SIM, false);
+        Reader in = new FileReader("./pgh_review.csv");
+        Iterable<CSVRecord> records = CSVFormat.EXCEL.withFirstRecordAsHeader().parse(in);
+        for (CSVRecord record : records) {
+            Document doc = genDocFromCSVRecord(record, false);
+            ixwriter.addDocument(doc);
+        }
+        ixwriter.close();
+        this.directory.close();
+        in.close();
+    }
+
+    private IndexWriter genIxWriter(Similarity s, boolean isNlp) throws Exception {
+        this.directory = FSDirectory.open(Paths.get(isNlp ? Config.LUCENE_NLP_INDEX_PATH : Config.LUCENE_ORIGINAL_INDEX_PATH));
         IndexWriterConfig config = new IndexWriterConfig(new StandardAnalyzer());
         if (s != null) config.setSimilarity(s);
         return new IndexWriter(this.directory, config);
     }
 
-    private Document genDocFromCSVRecord(CSVRecord record) {
+    private Document genDocFromCSVRecord(CSVRecord record, boolean isNlp) {
         Document doc = new Document();
 
         String bid = record.get("business_id");
@@ -65,6 +80,8 @@ public class genIndexTest {
         String name = record.get("name");
         String addr = record.get("address");
         String txt = record.get("comment_text");
+        String nlpFullTxt = "";
+        if (isNlp) nlpFullTxt = record.get("comment_full");
         Long cool = Long.valueOf(record.get("comment_cool"));
         Long useful = Long.valueOf(record.get("comment_useful"));
         Long fun = Long.valueOf(record.get("comment_funny"));
@@ -81,9 +98,10 @@ public class genIndexTest {
 
         doc.add(new StringField(Config.INDEXER_BUSS_ID, bid, Field.Store.YES));
         doc.add(new StringField(Config.INDEXER_COMMENT_ID, cid, Field.Store.YES));
-        doc.add(new Field(Config.INDEXER_SHOP_NAME, name, metaFieldType));
-        doc.add(new Field(Config.INDEXER_SHOP_ADDRESS, addr, metaFieldType));
-        doc.add(new TextField(Config.INDEXER_COMMENT_TXT, txt, Field.Store.YES));
+        // For NLP, will use coreference subed comment text if possible
+        doc.add(new TextField(Config.INDEXER_COMMENT_TXT
+                , isNlp ? ((nlpFullTxt == null || nlpFullTxt.isEmpty()) ? txt : nlpFullTxt) : txt
+                , isNlp ? Field.Store.YES : Field.Store.NO));
         doc.add(new SortedNumericDocValuesField(Config.INDEXER_NUM_COOL, cool));
         doc.add(new SortedNumericDocValuesField(Config.INDEXER_NUM_USEFUL, useful));
         doc.add(new SortedNumericDocValuesField(Config.INDEXER_NUM_FUN, fun));

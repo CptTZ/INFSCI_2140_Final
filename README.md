@@ -21,7 +21,7 @@
 Suggest using Anaconda to manage dependencies, suppose you changed current directory to the root of our source.
 
 ```bash
-conda create -n ir python=3.7 spacy=2.0.12 nltk
+conda create -n ir python=3.7 spacy=2.0.12 nltk pandas
 conda activate ir
 # Below is not necessary unless start from scratch
 pip install https://github.com/huggingface/neuralcoref-models/releases/download/en_coref_md-3.0.0/en_coref_md-3.0.0.tar.gz

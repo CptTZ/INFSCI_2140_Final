@@ -9,18 +9,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 import pitt.infsci2140.finalprj.controller.search.vo.SearchBean;
 import pitt.infsci2140.finalprj.controller.search.vo.SearchResultBean;
-import pitt.infsci2140.finalprj.service.OriginalSearchService;
+import pitt.infsci2140.finalprj.service.NlpSearchService;
 
 import java.util.List;
 
 @Controller
 public class SearchController {
 
-    private final OriginalSearchService originalSearchService;
+    private final NlpSearchService nlpSearchService;
 
     @Autowired
-    public SearchController(OriginalSearchService originalSearchService) {
-        this.originalSearchService = originalSearchService;
+    public SearchController(NlpSearchService nlp) {
+        this.nlpSearchService = nlp;
     }
 
     @GetMapping("/")
@@ -31,7 +31,7 @@ public class SearchController {
 
     @PostMapping("/")
     public ModelAndView originalSearchResult(@ModelAttribute SearchBean search, ModelAndView model) {
-        List<SearchResultBean> res = originalSearchService.queryByTerm(search.getQuery(), 20);
+        List<SearchResultBean> res = nlpSearchService.queryNormalByTerm(search.getQuery(), 20);
         if (res.size() == 0) {
             // No result, redo search
             model.setViewName("searchResult");
@@ -46,7 +46,7 @@ public class SearchController {
         return model;
     }
 
-    @PostMapping("/nlp")
+    @PostMapping("/advSearch")
     public ModelAndView nlpSearchResult(@ModelAttribute SearchBean search, ModelAndView model) {
         model.setViewName("search");
         return model;

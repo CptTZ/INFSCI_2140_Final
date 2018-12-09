@@ -1,5 +1,4 @@
 import json
-import numpy as np
 import pandas as pd
 import sys
 from nltk import tokenize
@@ -76,12 +75,8 @@ def ranking(searchTerm, path):
         relatedSents = ""
         # get the business id of the ith review
         bid = relatedReviews["business_id"][i]
-        # Some may be nan (Unknown)
-        aReview = relatedReviews["comment_full"][i]
-        if aReview is np.nan:
-            aReview = relatedReviews["comment_text"][i]
         # get the ith review and make all characters lowercased
-        aReview = aReview.lower()
+        aReview = relatedReviews["review"][i].lower()
         # split the review by cutSymbol
         sentsReview = getSplit(aReview, cutSymbol)
         for sent in sentsReview:
@@ -107,7 +102,10 @@ def ranking(searchTerm, path):
     bidRatioDict = {}
     for bid in bidScoreDict:
         bidRatioDict[bid] = bidScoreDict[bid][0] / bidScoreDict[bid][1]
-    print(json.dumps(bidRatioDict))
+    from operator import itemgetter
+    from collections import OrderedDict
+    sortedBidRatioDict = OrderedDict(sorted(bidRatioDict.items(), key=itemgetter(1), reverse=True))
+    print(json.dumps(sortedBidRatioDict))
 
 
 ranking(sys.argv[2], sys.argv[1])
