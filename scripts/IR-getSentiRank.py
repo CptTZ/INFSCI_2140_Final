@@ -1,5 +1,5 @@
 import json
-import pandas as pd
+import csv
 import sys
 from nltk import tokenize
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
@@ -45,9 +45,6 @@ def getSentiScore(sent):
 
 
 def ranking(searchTerm, path):
-    # get all the related reviews
-    relatedReviews = pd.read_csv(path)
-
     # new a dictionary to save the bid and sentiScore
     bidScoreDict = {}
     # initialize flag
@@ -70,38 +67,43 @@ def ranking(searchTerm, path):
         "while",
     ]
     # cut each review into several sentences
-    for i in range(relatedReviews.shape[0]):
-        # initialize relatedSents
-        relatedSents = ""
-        # get the business id of the ith review
-        bid = relatedReviews["business_id"][i]
-        # get the ith review and make all characters lowercased
-        aReview = relatedReviews["review"][i].lower()
-        # split the review by cutSymbol
-        sentsReview = getSplit(aReview, cutSymbol)
-        for sent in sentsReview:
-            if check(sent, searchTerm.lower().split(" ")):
-                relatedSents = relatedSents + ". " + sent
-                flag = 1
-        if flag == 1:
-            # get sentiment score of relatedSents
-            sentiScore = getSentiScore(relatedSents)
-            if bid in bidScoreDict:
-                if sentiScore > 0:
-                    bidScoreDict[bid][0] = bidScoreDict[bid][0] + 1
-                    bidScoreDict[bid][1] = bidScoreDict[bid][1] + 1
+    # get all the related reviews
+    with open(path) as a:
+        reader = csv.reader(a)
+        headers = next(reader, None)
+        for relatedReview in reader:
+            # initialize relatedSents
+            relatedSents = ""
+            # get the business id of the ith review
+            bid = relatedReview[0]
+            # get the ith review and make all characters lowercased
+            aReview = relatedReview[1].lower()
+            # split the review by cutSymbol
+            sentsReview = getSplit(aReview, cutSymbol)
+            for sent in sentsReview:
+                if check(sent, searchTerm.lower().split(" ")):
+                    relatedSents = relatedSents + ". " + sent
+                    flag = 1
+            if flag == 1:
+                # get sentiment score of relatedSents
+                sentiScore = getSentiScore(relatedSents)
+                if bid in bidScoreDict:
+                    if sentiScore > 0:
+                        bidScoreDict[bid][0] = bidScoreDict[bid][0] + 1
+                        bidScoreDict[bid][1] = bidScoreDict[bid][1] + 1
+                    else:
+                        bidScoreDict[bid][1] = bidScoreDict[bid][1] + 1
                 else:
-                    bidScoreDict[bid][1] = bidScoreDict[bid][1] + 1
-            else:
-                if sentiScore > 0:
-                    bidScoreDict[bid] = [1, 1]
-                else:
-                    bidScoreDict[bid] = [0, 1]
-            flag = 0
+                    if sentiScore > 0:
+                        bidScoreDict[bid] = [1, 1]
+                    else:
+                        bidScoreDict[bid] = [0, 1]
+                flag = 0
     # calculate the score of each restaurant
     bidRatioDict = {}
     for bid in bidScoreDict:
         bidRatioDict[bid] = bidScoreDict[bid][0] / bidScoreDict[bid][1]
+    # Return a DESC-by-value-ordered dictionary
     from operator import itemgetter
     from collections import OrderedDict
     sortedBidRatioDict = OrderedDict(sorted(bidRatioDict.items(), key=itemgetter(1), reverse=True))

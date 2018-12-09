@@ -18,10 +18,12 @@ public class Config {
     public static final String YELP_API_ENDPOINT = "https://api.yelp.com/v3/businesses/";
 
     public static final String NLP_PYTHON_PATH = "~/irf/bin/python";
+    public static final String NLP_PYSCRIPT_PATH = "./scripts/IR-getSentiRank.py";
     public static final String LUCENE_ORIGINAL_INDEX_PATH = "./lucene/index_orig";
     public static final String LUCENE_NLP_INDEX_PATH = "./lucene/index_nlp";
     public static final ApplicationTemp APP_TMP = new ApplicationTemp(FinalApplication.class);
     public static final File IR_TMP_PATH = APP_TMP.getDir("ir");
+    public static final File CURRENT_WORKING_DIR = new File(System.getProperty("user.dir"));
 
     public static final Similarity PROJECT_DEFAULT_SIM = new BM25Similarity();
 

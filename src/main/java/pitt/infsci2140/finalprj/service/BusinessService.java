@@ -72,10 +72,14 @@ public class BusinessService {
         Request r = genRequest(bid);
         try (Response response = Config.HTTP_CLIENT.newCall(r).execute()) {
             if (!response.isSuccessful() || response.body() == null) {
+                if (response.code() == 429) {
+                    logger.error("Request send too fast");
+                    return "";
+                }
                 throw new IOException("Unexpected code " + response);
             }
             // Random latency to avoid Yelp's API rate limit
-            Thread.sleep(this.r.nextInt(50));
+            Thread.sleep(this.r.nextInt(70));
             return response.body().string();
         } catch (Exception e) {
             logger.error("Call to Yelp API error", e);

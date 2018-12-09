@@ -97,11 +97,10 @@ public class genIndexTest {
         Assert.assertTrue(star >= 0);
 
         doc.add(new StringField(Config.INDEXER_BUSS_ID, bid, Field.Store.YES));
-        doc.add(new StringField(Config.INDEXER_COMMENT_ID, cid, Field.Store.YES));
+        // doc.add(new StringField(Config.INDEXER_COMMENT_ID, cid, Field.Store.YES));
         // For NLP, will use coreference subed comment text if possible
-        doc.add(new TextField(Config.INDEXER_COMMENT_TXT
-                , isNlp ? ((nlpFullTxt == null || nlpFullTxt.isEmpty()) ? txt : nlpFullTxt) : txt
-                , isNlp ? Field.Store.YES : Field.Store.NO));
+        String toSearchText = name + "  " + (isNlp ? ((nlpFullTxt == null || nlpFullTxt.isEmpty()) ? txt : nlpFullTxt) : txt);
+        doc.add(new TextField(Config.INDEXER_COMMENT_TXT, toSearchText, isNlp ? Field.Store.YES : Field.Store.NO));
         doc.add(new SortedNumericDocValuesField(Config.INDEXER_NUM_COOL, cool));
         doc.add(new SortedNumericDocValuesField(Config.INDEXER_NUM_USEFUL, useful));
         doc.add(new SortedNumericDocValuesField(Config.INDEXER_NUM_FUN, fun));

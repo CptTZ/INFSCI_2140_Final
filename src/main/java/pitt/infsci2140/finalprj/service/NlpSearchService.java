@@ -36,23 +36,24 @@ public class NlpSearchService extends OriginalSearchService {
     public List<SearchResultBean> queryNlpByTerm(String term, int businessLimit) {
         if (term == null || term.isEmpty()) return new ArrayList<>(0);
         try {
-            TopDocs topDocs = searchNlpTerm(term, businessLimit * 50);
+            TopDocs topDocs = searchNlpTerm(term, businessLimit * 100);
             if (topDocs.totalHits == 0L) return new ArrayList<>(0);
 
             String taskUuid = UUID.randomUUID().toString();
             File tmpCsvPath = new File(Config.IR_TMP_PATH, taskUuid + ".csv");
             tmpCsvPath.deleteOnExit();
-            logger.debug("Temp CSV path: {}", tmpCsvPath.getAbsolutePath());
 
             // Bridge to Python
             String lowerTerm = term.toLowerCase(Locale.US);
+
             if (!this.pythonNlpCache.containsKey(lowerTerm)) {
                 // Initial into
                 writeOutCsvForPyNLP(topDocs.scoreDocs, tmpCsvPath);
                 this.pythonNlpCache.put(lowerTerm, getPythonSentimentResult(taskUuid, tmpCsvPath, term));
             } else {
-                // Has info but info is probably not right
-                if (this.pythonNlpCache.get(lowerTerm).isEmpty()) {
+                String pyOut = this.pythonNlpCache.get(lowerTerm);
+                // Has info but info is probably not right (valid JSON return must have length > 10)
+                if (pyOut.isEmpty() || pyOut.length() < 10) {
                     writeOutCsvForPyNLP(topDocs.scoreDocs, tmpCsvPath);
                     this.pythonNlpCache.put(lowerTerm, getPythonSentimentResult(taskUuid, tmpCsvPath, term));
                 }
@@ -60,6 +61,7 @@ public class NlpSearchService extends OriginalSearchService {
             String pythonOutput = this.pythonNlpCache.get(lowerTerm);
             JsonNode root = Config.JSON_MAPPER.readTree(pythonOutput);
             int totalHits = root.size();
+            logger.debug("Indiv business size: {}", totalHits);
             int listSize = businessLimit > totalHits ? totalHits : businessLimit;
 
             // Build results
@@ -104,12 +106,13 @@ public class NlpSearchService extends OriginalSearchService {
     }
 
     private void writeOutCsvForPyNLP(ScoreDoc[] docs, File tmpCsvPath) throws IOException {
-        try (CSVPrinter p = new CSVPrinter(new FileWriter(tmpCsvPath), CSVFormat.RFC4180)) {
+        try (CSVPrinter p = new CSVPrinter(new BufferedWriter(new FileWriter(tmpCsvPath)), CSVFormat.EXCEL)) {
             p.printRecord("business_id", "review");
             for (ScoreDoc doc : docs) {
                 p.printRecord(getBusinessIdByDocId(doc.doc), getReviewTextByDocid(doc.doc));
             }
         }
+        logger.debug("Write temp CSV: {}", tmpCsvPath.getAbsolutePath());
     }
 
     private String cleanQueryForNlp(String input) {
@@ -120,9 +123,9 @@ public class NlpSearchService extends OriginalSearchService {
     }
 
     private String getPythonSentimentResult(String taskUuid, File csvPath, String queryTerm) throws IOException {
-        ProcessBuilder pb = new ProcessBuilder(Config.NLP_PYTHON_PATH, "scripts/IR-getSentiRank.py",
+        ProcessBuilder pb = new ProcessBuilder(Config.NLP_PYTHON_PATH, Config.NLP_PYSCRIPT_PATH,
                 csvPath.getAbsolutePath(), cleanQueryForNlp(queryTerm));
-        Process p = pb.directory(new File(System.getProperty("user.dir"))).start();
+        Process p = pb.directory(Config.CURRENT_WORKING_DIR).start();
         StringWriter sw = new StringWriter(), swE = new StringWriter();
         InputStream in = p.getInputStream();
         InputStream inE = p.getErrorStream();
