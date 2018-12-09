@@ -10,4 +10,4 @@ for i in range(fin.shape[0]):
     rReview = nlp(aReview)._.coref_resolved
     rReviews.append(rReview)
 fout = pd.concat([fin, pd.DataFrame({"comment_full": rReviews})], axis=1)
-fout.to_csv("pgh_review_nlp.csv")
+fout.to_csv("pgh_review_nlp.csv", index=False)

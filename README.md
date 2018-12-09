@@ -6,8 +6,27 @@
 
 ### Dependency
 
+#### System
+
+- Windows: Has Visual Studio C++ build tools available
+- Linux: gcc or any other C compiler
+
+#### Java
+
 - OpenJDK 1.8, and have `java`, `javac` added to your `PATH` variable.
 - Maven manages the rest of the dependencies
+
+#### Python (NLP)
+
+Suggest using Anaconda to manage dependencies, suppose you changed current directory to the root of our source.
+
+```bash
+conda create -n ir python=3.7 spacy=2.0.12 nltk
+conda activate ir
+# Below is not necessary unless start from scratch
+pip install https://github.com/huggingface/neuralcoref-models/releases/download/en_coref_md-3.0.0/en_coref_md-3.0.0.tar.gz
+python scripts/IR-initSentiRank.py
+```
 
 ### How to
 
