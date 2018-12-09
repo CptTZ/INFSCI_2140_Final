@@ -3,10 +3,12 @@ package pitt.infsci2140.finalprj.service;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.FSDirectory;
@@ -43,13 +45,7 @@ public class OriginalSearchService {
             ArrayList<SearchResultBean> res = new ArrayList<>(listSize);
 
             for (ScoreDoc doc : docs) {
-                Document oneDoc = reader.document(doc.doc);
-                SearchResultBean s = new SearchResultBean();
-                s.setAddress(oneDoc.get(Config.INDEXER_SHOP_ADDRESS));
-                s.setCommentId(oneDoc.get(Config.INDEXER_COMMENT_ID));
-                s.setName(oneDoc.get(Config.INDEXER_SHOP_NAME));
-                s.setScore(doc.score);
-                res.add(s);
+                res.add(docidToSearchResultBean(doc.doc, doc.score));
             }
 
             return res;
@@ -77,14 +73,6 @@ public class OriginalSearchService {
         }
     }
 
-    private TopDocs searchTerm(String term, int limit) throws ParseException, IOException {
-        if (isSearcherNotReady()) prepSearch();
-        TopDocs tops = indexSearcher.search(queryParser.parse(term), limit);
-
-        logger.debug("Term {}, result#: {}", term, tops.totalHits);
-        return tops;
-    }
-
     private boolean isSearcherNotReady() {
         return (this.reader == null || this.indexSearcher == null);
     }
@@ -93,6 +81,33 @@ public class OriginalSearchService {
         IndexSearcher searcher = new IndexSearcher(this.reader);
         if (s != null) searcher.setSimilarity(s);
         return searcher;
+    }
+
+    private TopDocs searchTerm(String term, int limit) throws ParseException, IOException {
+        if (isSearcherNotReady()) prepSearch();
+        TopDocs tops = indexSearcher.search(queryParser.parse(term), limit);
+
+        logger.debug("Term {}, result#: {}", term, tops.totalHits);
+        return tops;
+    }
+
+    private SearchResultBean searchByBussinessId(String bid) throws IOException {
+        if (bid == null || bid.isEmpty()) return null;
+        TermQuery tq = new TermQuery(new Term(Config.INDEXER_BUSS_ID, bid));
+        TopDocs t = this.indexSearcher.search(tq, 1);
+        if (t.totalHits == 0L) return null;
+        ScoreDoc d = t.scoreDocs[0];
+        return docidToSearchResultBean(d.doc, d.score);
+    }
+
+    private SearchResultBean docidToSearchResultBean(int docid, float score) throws IOException {
+        SearchResultBean s = new SearchResultBean();
+        Document d = this.indexSearcher.doc(docid);
+        s.setAddress(d.get(Config.INDEXER_SHOP_ADDRESS));
+        s.setCommentId(d.get(Config.INDEXER_COMMENT_ID));
+        s.setName(d.get(Config.INDEXER_SHOP_NAME));
+        s.setScore(score);
+        return s;
     }
 
 }

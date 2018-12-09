@@ -1,6 +1,5 @@
 package pitt.infsci2140.finalprj.controller.search;
 
-import org.apache.lucene.document.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,10 +9,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 import pitt.infsci2140.finalprj.controller.search.vo.SearchBean;
 import pitt.infsci2140.finalprj.controller.search.vo.SearchResultBean;
-import pitt.infsci2140.finalprj.misc.Config;
 import pitt.infsci2140.finalprj.service.OriginalSearchService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -27,13 +24,13 @@ public class SearchController {
     }
 
     @GetMapping("/")
-    public String index(Model model) {
+    public String homeSearch(Model model) {
         model.addAttribute("s", new SearchBean());
         return "search";
     }
 
     @PostMapping("/")
-    public ModelAndView greetingSubmit(@ModelAttribute SearchBean search, ModelAndView model) {
+    public ModelAndView originalSearchResult(@ModelAttribute SearchBean search, ModelAndView model) {
         List<SearchResultBean> res = originalSearchService.queryByTerm(search.getQuery(), 20);
         if (res.size() == 0) {
             // No result, redo search
@@ -46,6 +43,12 @@ public class SearchController {
         model.addObject("hasRes", true);
         model.addObject("results", res);
         model.addObject("retS", search);
+        return model;
+    }
+
+    @PostMapping("/nlp")
+    public ModelAndView nlpSearchResult(@ModelAttribute SearchBean search, ModelAndView model) {
+        model.setViewName("search");
         return model;
     }
 

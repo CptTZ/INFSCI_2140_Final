@@ -1,5 +1,6 @@
 package pitt.infsci2140.finalprj.misc;
 
+import okhttp3.OkHttpClient;
 import org.apache.lucene.search.similarities.BM25Similarity;
 import org.apache.lucene.search.similarities.Similarity;
 import org.springframework.boot.system.ApplicationTemp;
@@ -10,6 +11,9 @@ import java.io.File;
 public class Config {
 
     private Config() {}
+
+    public static final OkHttpClient httpClient = new OkHttpClient();
+    public static final String yelpApiPath = "https://api.yelp.com/v3/businesses/";
 
     public static final String LUCENE_ORIGINAL_INDEX_PATH = "./lucene/index_orig";
     public static final String LUCENE_NLP_INDEX_PATH = "./lucene/index_nlp";

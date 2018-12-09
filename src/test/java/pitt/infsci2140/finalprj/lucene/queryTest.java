@@ -35,7 +35,7 @@ public class queryTest {
         IndexSearcher searcher = new IndexSearcher(DirectoryReader.open(FSDirectory.open(Paths.get(Config.LUCENE_ORIGINAL_INDEX_PATH))));
         Term t = new Term(Config.INDEXER_BUSS_ID, "UmZnFzo-NK2daxkl3_Rieg");
         TermQuery tq = new TermQuery(t);
-        TopDocs td = searcher.search(tq, 100);
+        TopDocs td = searcher.search(tq, Integer.MAX_VALUE);
         Assert.assertEquals(5, td.totalHits);
     }
 

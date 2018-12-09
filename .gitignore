@@ -1,6 +1,8 @@
 # Project specific
-pgh_review.csv
+/pgh_review.csv
+/pgh_review_nlp.csv
 /lucene/
+/src/main/resources/application-default.properties
 
 ### macOS template
 # General
@@ -108,7 +110,7 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
-.mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.jar
 
 ### Java template
 # Compiled class file
