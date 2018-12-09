@@ -75,7 +75,7 @@ public class BusinessService {
                 throw new IOException("Unexpected code " + response);
             }
             // Random latency to avoid Yelp's API rate limit
-            Thread.sleep(this.r.nextInt(250));
+            Thread.sleep(this.r.nextInt(100));
             return response.body().string();
         } catch (Exception e) {
             logger.error("Call to Yelp API error", e);
