@@ -103,9 +103,17 @@ public class NlpSearchService extends OriginalSearchService {
         }
     }
 
+    private String cleanQueryForNlp(String input) {
+        if (input.startsWith("'") || input.startsWith("\"")) input = input.substring(1);
+        if (input.endsWith("'") || input.endsWith("\"")) input = input.substring(0, input.length() - 1);
+        logger.debug("Cleaned query term: {}", input);
+        return input;
+    }
+
     private String getPythonSentimentResult(String taskUuid, File csvPath, String queryTerm) throws IOException {
+        String cleanedQuery = cleanQueryForNlp(queryTerm);
         ProcessBuilder pb = new ProcessBuilder(Config.NLP_PYTHON_PATH, "scripts/IR-getSentiRank.py",
-                csvPath.getAbsolutePath(), queryTerm);
+                csvPath.getAbsolutePath(), cleanedQuery);
         Process p = pb.directory(new File(System.getProperty("user.dir"))).start();
         StringWriter sw = new StringWriter(), swE = new StringWriter();
         InputStream in = p.getInputStream();
