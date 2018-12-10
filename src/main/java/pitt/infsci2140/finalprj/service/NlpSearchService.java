@@ -36,7 +36,7 @@ public class NlpSearchService extends OriginalSearchService {
     public List<SearchResultBean> queryNlpByTerm(String term, int businessLimit) {
         if (term == null || term.isEmpty()) return new ArrayList<>(0);
         try {
-            TopDocs topDocs = searchNlpTerm(term, businessLimit * 100);
+            TopDocs topDocs = searchNlpTerm(term, businessLimit * 80);
             if (topDocs.totalHits == 0L) return new ArrayList<>(0);
 
             String taskUuid = UUID.randomUUID().toString();

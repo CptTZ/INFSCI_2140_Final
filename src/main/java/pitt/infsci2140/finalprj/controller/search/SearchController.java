@@ -31,13 +31,13 @@ public class SearchController {
 
     @PostMapping("/")
     public ModelAndView originalSearchResult(@ModelAttribute SearchBean search, ModelAndView model) {
-        List<SearchResultBean> res = nlpSearchService.queryNormalByTerm(search.getQuery(), 20);
+        List<SearchResultBean> res = nlpSearchService.queryNormalByTerm(search.getQuery(), 15);
         return getModelAndView(search, model, res);
     }
 
     @PostMapping("/advSearch")
     public ModelAndView nlpSearchResult(@ModelAttribute SearchBean search, ModelAndView model) {
-        List<SearchResultBean> res = nlpSearchService.queryNlpByTerm(search.getQuery(), 20);
+        List<SearchResultBean> res = nlpSearchService.queryNlpByTerm(search.getQuery(), 15);
         return getModelAndView(search, model, res);
     }
 
